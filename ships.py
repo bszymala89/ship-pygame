@@ -25,7 +25,7 @@ def draw_board():
             if (y, x) in shot_list:
                 color = COLOR_SHOT
 
-            pygame.draw.rect(screen, color, pygame.Rect(CELL_SIZE * y, CELL_SIZE * x, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(screen, color, pygame.Rect(CELL_SIZE * y + (5 * y), CELL_SIZE * x + (5 * x), CELL_SIZE, CELL_SIZE))
 
 while running:
     for event in pygame.event.get():

@@ -1,23 +1,67 @@
+from enum import Enum
+
+import pygame_menu
 import pygame
 
 pygame.init()
 
 screen = pygame.display.set_mode((1280, 720))
+
+font = pygame.font.Font('freesansbold.ttf', 32)
+
 GRID_SIZE = 10
 CELL_SIZE = 50
 GRID_SPACING = 5
 
 BOARD_SIZE = GRID_SIZE * CELL_SIZE + (GRID_SIZE - 1) * GRID_SPACING
 
-running = True
-
 COLOR_CELL = (0, 123, 255)
 COLOR_SHOT = (0, 85, 176)
 COLOR_DEAD_SHIP = (222, 24, 24)
 COLOR_SHIP = (50, 50, 50)
 
+COLOR_BACKROUND = (255, 255, 255)
+COLOR_BUTTON = (200, 200, 200)
+
 shot_list = [(4,7), (1,5), (3,9)]
 ship_list = [(6,9), (1,5), (5,4)]
+
+running = True
+
+def draw_menu():
+    menu = pygame_menu.Menu(
+        height=720, theme=pygame_menu.themes.THEME_BLUE, title="Ship game", width=1280
+    )
+
+    menu.add.button("Play", lambda: print("play"))
+    menu.add.button("Settings", lambda: print("settings"))
+    menu.add.button("Exit", lambda: exit())
+
+    #
+
+
+    menu.mainloop(screen)
+
+def draw_settings_menu():
+    menu = pygame_menu.Menu(
+        height=720, theme=pygame_menu.themes.THEME_BLUE, title="Settings", width=1280
+    )
+
+    menu.add.selector("Game mode ", [("Player vs Machine", 1), ("Player vs Player", 2)])
+    menu.add.text_input("Board size ", default="10")
+    menu.add.selector("Ship placement mode ", [("Manual", 1), ("Auto", 2)])
+    menu.add.text_input("Ship limit ", default="5")
+    menu.add.range_slider("Turn time limit ", 30, (5, 60), 5)
+
+    menu.add.none_widget()
+    menu.add.none_widget()
+
+    menu.add.button("Back to main menu", align=pygame_menu.locals.ALIGN_LEFT)
+
+    menu.add.button("Play", align=pygame_menu.locals.ALIGN_RIGHT)
+
+    menu.mainloop(screen)
+
 
 def draw_board():
     #pygame.draw.rect
@@ -50,7 +94,8 @@ while running:
             column = x / CELL_SIZE
             row = y / CELL_SIZE
 
-    draw_board()
+    # draw_board()
+    draw_settings_menu()
 
     pygame.display.flip()
 

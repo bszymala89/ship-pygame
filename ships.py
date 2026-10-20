@@ -1,11 +1,11 @@
-from enum import Enum
+from enum import Enum, auto
 
 import pygame_menu
 import pygame
 
 pygame.init()
 
-screen = pygame.display.set_mode((1280, 720))
+window = pygame.display.set_mode((1280, 720))
 
 font = pygame.font.Font('freesansbold.ttf', 32)
 
@@ -28,19 +28,40 @@ ship_list = [(6,9), (1,5), (5,4)]
 
 running = True
 
-def draw_menu():
+class screen(Enum):
+    MENU = auto()
+    SETTINGS = auto()
+    GAME = auto()
+current_screen = screen.MENU
+
+def settings():
+    global context
+
+    context = screen.MENU
+
+def play():
+    global context
+
+    context = draw_board
+
+def main_menu():
+    global context
+
+    context = draw_main_menu
+
+def draw_main_menu():
     menu = pygame_menu.Menu(
         height=720, theme=pygame_menu.themes.THEME_BLUE, title="Ship game", width=1280
     )
 
-    menu.add.button("Play", lambda: print("play"))
-    menu.add.button("Settings", lambda: print("settings"))
+    menu.add.button("Play", play)
+    menu.add.button("Settings", settings)
     menu.add.button("Exit", lambda: exit())
 
     #
 
 
-    menu.mainloop(screen)
+    menu.mainloop(window)
 
 def draw_settings_menu():
     menu = pygame_menu.Menu(
@@ -56,11 +77,11 @@ def draw_settings_menu():
     menu.add.none_widget()
     menu.add.none_widget()
 
-    menu.add.button("Back to main menu", align=pygame_menu.locals.ALIGN_LEFT)
+    menu.add.button("Back to main menu", lambda: main_menu, align=pygame_menu.locals.ALIGN_LEFT)
 
-    menu.add.button("Play", align=pygame_menu.locals.ALIGN_RIGHT)
+    menu.add.button("Play", play, align=pygame_menu.locals.ALIGN_RIGHT)
 
-    menu.mainloop(screen)
+    menu.mainloop(window)
 
 
 def draw_board():
@@ -94,8 +115,15 @@ while running:
             column = x / CELL_SIZE
             row = y / CELL_SIZE
 
+    if current_screen == screen.GAME:
+        draw_board()
+    elif current_screen == screen.MENU:
+        draw_main_menu
+    elif current_screen == screen.SETTINGS:
+        draw_settings_menu()
+
     # draw_board()
-    draw_settings_menu()
+    context()
 
     pygame.display.flip()
 

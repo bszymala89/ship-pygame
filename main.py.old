@@ -1,0 +1,198 @@
+import subprocess
+import pygame
+
+size = 10
+number_of_one_size_ships = 1
+number_of_two_size_ships = 2
+show_where_shot = True
+show_enemy_where_shot = True
+
+starting_letter = 65
+has_ended = False
+number_of_ships = number_of_one_size_ships + number_of_two_size_ships
+number_of_hit_points = number_of_one_size_ships + (number_of_two_size_ships * 2)
+
+movement_helper = [
+    (-1, 0), #UP: 0
+    (1, 0), #DOWN: 1
+    (0, 1), #RIGHT: 2
+    (0, -1)] #LEFT: 3
+types_of_ship = {
+    1: "One Spot Ship",
+    2: "Two Spot Ship"
+}
+
+class player():
+    def __init__(self, board, enemy_board, name):
+        self.board = board
+        self.enemy_board = enemy_board
+        self.name = name
+        self.ships_left = number_of_hit_points
+
+def create_board():
+    global size
+    board = []
+
+    for i in range(size):
+        temp_list = []
+        for j in range(size):
+            temp_list.append("~")
+
+        board.append(temp_list)
+
+    return board
+
+def display_board(board):
+    global size
+
+    display_string = ""
+
+    for i in range(1, size + 1):
+        display_string = display_string + " " + str(i)
+
+    display_string += "\n"
+
+    for i in range(size):
+        temp_string = ""
+
+        for j in range(size):
+            temp_string = temp_string + board[i][j] + " "
+
+        display_string = display_string + str(chr(starting_letter + i)) + " " + temp_string + "\n"
+
+    print(display_string)
+
+def convert_field_to_coordinates(field: str):
+    num = ""
+    for i in range(1, len(field)):
+        if field[i].isdecimal() == False:
+            print("Invalid coordinate format")
+            return
+        num = num + field[i]
+
+    temp = (field[0], int(num))
+
+    if temp[1] > size or ord(temp[0]) - starting_letter > size - 1:
+        print("The coordinate is out of bounds")
+        return
+
+    x = temp[1] - 1
+    y = ord(temp[0]) - starting_letter
+
+    return (y, x)
+
+def check_around_the_place(board, coordinate):
+    for i in range(4):
+        movement = movement_helper[i]
+        if coordinate[0] + movement[0] >= 0 and coordinate[1] + movement[1] >= 0:
+            if coordinate[0] + movement[0] <= size - 1 and coordinate[1] + movement[1] <= size - 1:
+                if board[coordinate[0] + movement[0]][coordinate[1] + movement[1]] == "*":
+                    print("You can't place your ship too close to a another ship")
+                    return False
+    return True
+                
+def place_ships(player: player):
+    number_of_placed_ships = 0
+    list_of_ships_to_place = [number_of_one_size_ships, number_of_two_size_ships]
+
+    #https://pygame.readthedocs.io/en/latest/1_intro/intro.html
+    #https://www.youtube.com/watch?v=blLLtdv4tvo
+    #https://www.geeksforgeeks.org/python/tic-tac-toe-gui-in-python-using-pygame/
+
+    for i in range(len(list_of_ships_to_place) - 1):
+        while True:
+            if list_of_ships_to_place[i] == number_of_placed_ships:
+                break
+
+            number_of_spots_to_place = i + 1
+
+            field = input(f'({player.name}) Input the coordinate of where do you want your ship placed in this format "A1" or type "view" to view the current board ({number_of_ships - number_of_placed_ships} Left) ')
+
+            if field == "view":
+                display_board(player.board)
+                continue
+            
+            coordinate = convert_field_to_coordinates(field)
+
+            if coordinate == None:
+                continue
+
+            if player.board[coordinate[0]][coordinate[1]] == "*":
+                print("This spot is already taken")
+                continue
+
+            if check_around_the_place(player.board, coordinate) == False:
+                continue
+
+            player.board[coordinate[0]][coordinate[1]] = "*"
+            number_of_placed_ships += 1
+
+    subprocess.run("cls", shell=True)
+
+def start_game():
+    player1 = player(create_board(), create_board(), "player1")
+    player2 = player(create_board(), create_board(), "player2")
+
+    place_ships(player1)
+    place_ships(player2)
+
+    player_list = [player1, player2]
+
+    print("Game has started")
+
+    while has_ended == False:
+        i = 0
+        while i < len(player_list):
+        # for i in range(len(player_list) - 1):
+            
+            enemy_player_num = 1
+                        
+            if i + 1 > len(player_list) - 1:
+                enemy_player_num = 0
+
+            print(f"its {player_list[i].name}'s turn")
+
+            field = input('Input a coordinate of to where you want to shoot in this format "A1" or type "view" to view enemy board or "view me" to see your own board: ')
+
+            if field == "view":
+                display_board(player_list[i].enemy_board)
+                continue
+
+            if field == "view me":
+                display_board(player_list[i].board)
+                continue
+
+            coordinate = convert_field_to_coordinates(field)
+
+            if coordinate == None:
+                continue
+
+            if player_list[enemy_player_num].board[coordinate[0]][coordinate[1]] == "*":
+                print("You have hit the enemy ship")
+                player_list[enemy_player_num].board[coordinate[0]][coordinate[1]] = "x"
+                player_list[enemy_player_num].ships_left -= 1
+
+                if player_list[enemy_player_num].ships_left == 0:
+                    print(f"{player_list[i].name} has won")
+                    has_ended = True
+                    break
+
+                print(player_list[enemy_player_num].ships_left)
+                player_list[i].enemy_board[coordinate[0]][coordinate[1]] = "x"
+                i += 1
+
+            elif player_list[enemy_player_num].board[coordinate[0]][coordinate[1]] == "~":
+                print("You didn't hit any of the enemy's ships")
+                if show_where_shot:
+                    if show_enemy_where_shot:
+                        player_list[enemy_player_num].board[coordinate[0]][coordinate[1]] = "o"
+                    player_list[i].enemy_board[coordinate[0]][coordinate[1]] = "o"
+                i += 1
+
+            elif player_list[i].enemy_board[coordinate[0]][coordinate[1]] == "o" or player_list[i].enemy_board[coordinate[0]][coordinate[1]] == "x":
+                print("You already shot there")
+                continue
+                
+
+
+start_game()

@@ -20,13 +20,13 @@ class game_Screen:
                 elif (y, x) in ship_list:
                     color = COLOR_SHIP
 
-                print(INITIAL_X_SPACING, INITIAL_Y_SPACING)
+                # print(INITIAL_X_SPACING, INITIAL_Y_SPACING)
     
                 pygame.draw.rect(
                     self.screen,
                     color,
                     pygame.Rect(
-                        (CELL_SIZE + GRID_SPACING) * y,
-                        (CELL_SIZE + GRID_SPACING) * x,
+                        ((CELL_SIZE + GRID_SPACING) * y) + INITIAL_Y_SPACING,
+                        ((CELL_SIZE + GRID_SPACING) * x) + INITIAL_X_SPACING,
                         CELL_SIZE,
                         CELL_SIZE))

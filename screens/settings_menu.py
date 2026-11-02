@@ -2,7 +2,7 @@ from settings import SCREEN_HEIGHT, SCREEN_WIDTH, PlayMode, ShipPlacemenMode , S
 import pygame_menu
 
 class Settings_menu:
-    def __init__(self, theme, settings: Settings):
+    def __init__(self, theme, settings: Settings, play, back):
         self.settings = settings
 
         self.menu = pygame_menu.Menu(
@@ -30,6 +30,26 @@ class Settings_menu:
             ],
             default=self.read_ship_placement_mode(),
             onchange=self.change_ship_placement_mode
+        )
+
+        self.menu.add.vertical_margin(SCREEN_HEIGHT - 250)
+
+        frame = self.menu.add.frame_h(SCREEN_WIDTH - 1, 60)
+
+        frame.pack(
+            self.menu.add.button(
+                "Back",
+                back,
+            ),
+            align=pygame_menu.locals.ALIGN_LEFT
+        )
+
+        frame.pack(
+            self.menu.add.button(
+                "Play",
+                play,
+            ),
+            align=pygame_menu.locals.ALIGN_RIGHT
         )
 
     def read_play_mode(self):

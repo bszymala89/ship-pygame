@@ -39,7 +39,7 @@ def main():
         running = False
 
     main_menu = Menu(screen, theme, show_settings, start_game, exit_game)
-    settings_menu = Settings_menu(theme, Settings)
+    settings_menu = Settings_menu(theme, Settings, start_game, show_main_menu)
     game_screen = game_Screen(screen)
 
     try:

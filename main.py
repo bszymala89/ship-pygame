@@ -15,6 +15,7 @@ def main():
 
     current_screen = "main_menu"
     running = True
+    is_in_game = True
     theme = pygame_menu.themes.THEME_BLUE
 
     font = pygame.font.Font("freesansbold.ttf", 32)
@@ -31,8 +32,9 @@ def main():
         print(current_screen)
 
     def start_game():
-        nonlocal current_screen
+        nonlocal current_screen, is_in_game
         current_screen = "game"
+        is_in_game = True
 
     def exit_game():
         nonlocal running
@@ -41,6 +43,9 @@ def main():
     main_menu = Menu(screen, theme, show_settings, start_game, exit_game)
     settings_menu = Settings_menu(theme, Settings, start_game, show_main_menu)
     game_screen = game_Screen(screen)
+
+    shot_list = []
+    ship_list = []
 
     try:
         while running:
@@ -67,7 +72,8 @@ def main():
                 settings_menu.handle_events(events)
                 settings_menu.draw(screen)
             elif current_screen == "game":
-                game_screen.draw([], [])
+                game_screen.handle_events(events)
+                game_screen.draw(shot_list, ship_list)
 
             pygame.display.flip()
     finally:

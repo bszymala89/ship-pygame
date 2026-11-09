@@ -1,4 +1,4 @@
-from settings import SCREEN_HEIGHT, SCREEN_WIDTH, PlayMode, ShipPlacemenMode , Settings
+from settings import SCREEN_HEIGHT, SCREEN_WIDTH, PlayMode, ShipPlacementMode , Settings
 import pygame_menu
 
 class Settings_menu:
@@ -25,8 +25,8 @@ class Settings_menu:
         self.menu.add.selector(
             "Ship placement mode",
             [
-                ("Manual", ShipPlacemenMode.MANUAL),
-                ("Auto", ShipPlacemenMode.AUTO)
+                ("Manual", ShipPlacementMode.MANUAL),
+                ("Auto", ShipPlacementMode.AUTO)
             ],
             default=self.read_ship_placement_mode(),
             onchange=self.change_ship_placement_mode
@@ -54,18 +54,19 @@ class Settings_menu:
 
     def read_play_mode(self):
         if self.settings.play_mode == PlayMode.PLAYER_VS_PLAYER:
-            return 1
-        return 0
+            return 2
+        return 1
 
     def change_play_mode(self, value, index):
         self.settings.play_mode = value
 
     def read_ship_placement_mode(self):
-            if self.settings.ship_placement_mode == ShipPlacemenMode.AUTO:
-                return 1
-            return 0
+        if self.settings.ship_placement_mode == ShipPlacementMode.AUTO:
+            return 2
+        return 1
     
     def change_ship_placement_mode(self, value, index):
+        print(value)
         self.settings.ship_placement_mode = value
 
     def handle_events(self, events):

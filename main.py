@@ -6,8 +6,8 @@ from screens.settings_menu import Settings_menu
 from screens.game_screen import game_Screen
 from screens.main_menu import Menu
 
-
 def main():
+
     pygame.init()
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -76,13 +76,16 @@ def main():
                 settings_menu.draw(screen)
             elif current_screen == "game":
                 # print(settings_menu.read_ship_placement_mode())
-                game_screen.handle_events(events)
+                new_screen = game_screen.handle_events(events)
+
+                if new_screen != None:
+                    current_screen = new_screen
+
                 game_screen.draw(font)
 
             pygame.display.flip()
     finally:
         pygame.quit()
-
 
 if __name__ == "__main__":
     main()

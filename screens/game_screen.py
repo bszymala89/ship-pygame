@@ -1,15 +1,47 @@
-from settings import GRID_SIZE, CELL_SIZE, GRID_SPACING, COLOR_CELL, COLOR_DEAD_SHIP, COLOR_SHOT,  COLOR_SHIP, CENTER_X_SPACING, CENTER_Y_SPACING, SHIP_NUMBER, GameStage, ShipPlacementMode
+from settings import GRID_SIZE, CELL_SIZE, GRID_SPACING, COLOR_CELL, COLOR_DEAD_SHIP, COLOR_SHOT,  COLOR_SHIP, COLOR_BACKROUND, CENTER_X_SPACING, CENTER_Y_SPACING, SHIP_NUMBER, SCREEN_HEIGHT, SCREEN_WIDTH, ShipPlacementMode
+from enum import Enum, auto
 import pygame
 import random
 
+class GameStage(Enum):
+    PLANNING = auto()
+    READY = auto()
+    PLAYING = auto()
+
 class game_Screen:
-    def __init__(self, screen):
+    def __init__(self, screen, settings):
         self.screen = screen
+        self.settings = settings
+
+        self.stage = GameStage.PLANNING
+        
+        self.start()
+
+    def start(self):
         self.selected_cells = set()
         self.ship_cells = set()
-        self.stage = GameStage.PLANNING
 
-    def handle_events(self, events, placement_mode):
+        if self.settings.ship_placement_mode == ShipPlacementMode.AUTO:
+            self.auto_planning()
+            self.stage = GameStage.PLAYING
+
+    def auto_planning(self):
+        for i in range(SHIP_NUMBER):
+            self.ship_cells.add((random.randint(0, GRID_SIZE), random.randint(0, GRID_SIZE)))
+
+    def manual_planning(self, horizontal_offset, horizontal_cell, vertical_offset, vertical_cell, step):
+        if (
+            0 <= horizontal_cell < GRID_SIZE
+            and 0 <= vertical_cell < GRID_SIZE
+            and horizontal_offset % step < CELL_SIZE
+            and vertical_offset % step < CELL_SIZE
+        ):
+            self.ship_cells.add((horizontal_cell, vertical_cell))
+
+        if len(self.ship_cells) == SHIP_NUMBER:
+            self.stage = GameStage.READY
+
+    def handle_events(self, events):
         step = CELL_SIZE + GRID_SPACING
         for event in events:
             if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
@@ -21,27 +53,17 @@ class game_Screen:
             horizontal_cell = horizontal_offset // step
             vertical_cell = vertical_offset // step
 
-            print(placement_mode)
-            print(id(placement_mode))
+            if self.start_button != None and self.stage == GameStage.READY:
+                if self.start_button.collidepoint((x, y)):
+                    self.stage = GameStage.PLAYING
 
-            if placement_mode == ShipPlacementMode.AUTO.value and self.stage != GameStage.PLAYING:
-                for i in range(SHIP_NUMBER):
-                    
-                    print("auto")
-                    self.ship_cells.add((random.randint(0, GRID_SIZE), random.randint(0, GRID_SIZE)))
-                    self.stage = GameStage.PLAYING
-            elif placement_mode == ShipPlacementMode.MANUAL.value and self.stage != GameStage.PLAYING:
-                if len(self.ship_cells) == SHIP_NUMBER:
-                    self.stage = GameStage.PLAYING
-    
-                if self.stage == GameStage.PLANNING:
-                    if (
-                        0 <= horizontal_cell < GRID_SIZE
-                        and 0 <= vertical_cell < GRID_SIZE
-                        and horizontal_offset % step < CELL_SIZE
-                        and vertical_offset % step < CELL_SIZE
-                    ):
-                        self.ship_cells.add((horizontal_cell, vertical_cell))
+            if self.main_menu_button != None:
+                if self.main_menu_button.collidepoint((x, y)):
+                    print("main_menu")
+
+            if len(self.ship_cells) != SHIP_NUMBER:
+                self.manual_planning(horizontal_offset, horizontal_cell, vertical_offset, vertical_cell, step)
+                return
 
             if self.stage == GameStage.PLAYING:
                 if (
@@ -50,10 +72,48 @@ class game_Screen:
                     and horizontal_offset % step < CELL_SIZE
                     and vertical_offset % step < CELL_SIZE
                 ):
-                    self.selected_cells.add((horizontal_cell, vertical_cell))  
+                    self.selected_cells.add((horizontal_cell, vertical_cell))
 
                     
-    def draw(self):
+    def draw(self, font):
+        text = font.render(f"current stage {self.stage}", False, (0,0,0))
+        self.screen.blit(text, (0,0))
+
+        if self.stage != GameStage.PLAYING:
+            start_text_size = font.render("Start Game", False, COLOR_BACKROUND).get_size()
+            main_menu_text_size = font.render("Main Menu", False, COLOR_BACKROUND).get_size()
+
+            self.start_button = pygame.draw.rect(
+                self.screen,
+                COLOR_BACKROUND,
+                pygame.Rect(
+                    (SCREEN_WIDTH // 2) - (start_text_size[0] // 2),
+                    SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.10),
+                    start_text_size[0],
+                    start_text_size[1]
+                )
+            )
+
+            self.main_menu_button = pygame.draw.rect(
+                self.screen,
+                COLOR_BACKROUND,
+                pygame.Rect(
+                    (SCREEN_WIDTH // 2) - (main_menu_text_size[0] // 2),
+                    SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.10),
+                    main_menu_text_size[0],
+                    main_menu_text_size[1]
+                )
+            )
+
+            if self.stage == GameStage.PLANNING:
+                ready_text = font.render("Start Game", False, (150,150,150))
+                self.screen.blit(ready_text, ((SCREEN_WIDTH // 2) - (ready_text.get_size()[0] // 2), SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.10)))
+            elif self.stage == GameStage.READY:
+                ready_text = font.render("Start Game", False, (0,0,0))
+                self.screen.blit(ready_text, ((SCREEN_WIDTH // 2) - (ready_text.get_size()[0] // 2), SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.10)))
+        
+        # make invisible rect to act as button or make a decorative rect with border radius and backround color
+
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 color = COLOR_CELL

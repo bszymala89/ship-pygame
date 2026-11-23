@@ -54,20 +54,20 @@ class Settings_menu:
 
     def read_play_mode(self):
         if self.settings.play_mode == PlayMode.PLAYER_VS_PLAYER:
-            return 2
-        return 1
+            return 1
+        return 0
 
     def change_play_mode(self, value, index):
         self.settings.play_mode = value
 
     def read_ship_placement_mode(self):
         if self.settings.ship_placement_mode == ShipPlacementMode.AUTO:
-            return 2
-        return 1
+            return 1
+        return 0
     
     def change_ship_placement_mode(self, value, index):
-        print(value)
         self.settings.ship_placement_mode = value
+
 
     def handle_events(self, events):
         self.menu.update(events)

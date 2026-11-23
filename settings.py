@@ -31,11 +31,7 @@ class ShipPlacementMode(Enum):
     MANUAL = auto()
     AUTO = auto()
 
-class GameStage(Enum):
-    PLANNING = auto()
-    PLAYING = auto()
-
 @dataclass
 class Settings:
     play_mode: PlayMode = PlayMode.PLAYER_VS_MACHINE
-    ship_placement_mode: ShipPlacementMode = ShipPlacementMode.AUTO
+    ship_placement_mode: ShipPlacementMode = ShipPlacementMode.MANUAL

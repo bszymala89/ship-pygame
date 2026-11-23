@@ -59,7 +59,8 @@ class game_Screen:
 
             if self.main_menu_button != None:
                 if self.main_menu_button.collidepoint((x, y)):
-                    print("main_menu")
+                    return "main_menu"
+                    
 
             if len(self.ship_cells) != SHIP_NUMBER:
                 self.manual_planning(horizontal_offset, horizontal_cell, vertical_offset, vertical_cell, step)
@@ -79,9 +80,23 @@ class game_Screen:
         text = font.render(f"current stage {self.stage}", False, (0,0,0))
         self.screen.blit(text, (0,0))
 
+        main_menu_text = font.render("Main Menu", False, (0,0,0))
+
+        self.main_menu_button = pygame.draw.rect(
+            self.screen,
+            COLOR_BACKROUND,
+            pygame.Rect(
+                SCREEN_WIDTH * 0.005,
+                SCREEN_HEIGHT * 0.95,
+                main_menu_text.get_size()[0],
+                main_menu_text.get_size()[1]
+            )
+        )
+
+        self.screen.blit(main_menu_text, (SCREEN_WIDTH * 0.005, SCREEN_HEIGHT * 0.95))
+
         if self.stage != GameStage.PLAYING:
             start_text_size = font.render("Start Game", False, COLOR_BACKROUND).get_size()
-            main_menu_text_size = font.render("Main Menu", False, COLOR_BACKROUND).get_size()
 
             self.start_button = pygame.draw.rect(
                 self.screen,
@@ -91,17 +106,6 @@ class game_Screen:
                     SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.10),
                     start_text_size[0],
                     start_text_size[1]
-                )
-            )
-
-            self.main_menu_button = pygame.draw.rect(
-                self.screen,
-                COLOR_BACKROUND,
-                pygame.Rect(
-                    (SCREEN_WIDTH // 2) - (main_menu_text_size[0] // 2),
-                    SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.10),
-                    main_menu_text_size[0],
-                    main_menu_text_size[1]
                 )
             )
 

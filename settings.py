@@ -6,6 +6,8 @@ from dataclasses import dataclass
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
+SHIP_NUMBER = 5
+
 GRID_SIZE = 10
 CELL_SIZE = 50
 GRID_SPACING = 5
@@ -25,11 +27,11 @@ class PlayMode(Enum):
     PLAYER_VS_MACHINE = auto()
     PLAYER_VS_PLAYER = auto()
 
-class ShipPlacemenMode(Enum):
+class ShipPlacementMode(Enum):
     MANUAL = auto()
     AUTO = auto()
 
 @dataclass
 class Settings:
     play_mode: PlayMode = PlayMode.PLAYER_VS_MACHINE
-    ship_placement_mode: ShipPlacemenMode = ShipPlacemenMode.MANUAL
+    ship_placement_mode: ShipPlacementMode = ShipPlacementMode.MANUAL

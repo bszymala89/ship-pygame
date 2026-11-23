@@ -1,7 +1,7 @@
 import pygame_menu
 import pygame
 
-from settings import SCREEN_HEIGHT, SCREEN_WIDTH, COLOR_BACKROUND, Settings
+from settings import SCREEN_HEIGHT, SCREEN_WIDTH, COLOR_BACKROUND, Settings, ShipPlacementMode
 from screens.settings_menu import Settings_menu
 from screens.game_screen import game_Screen
 from screens.main_menu import Menu
@@ -40,9 +40,11 @@ def main():
         nonlocal running
         running = False
 
+    settings = Settings()
+
     main_menu = Menu(screen, theme, show_settings, start_game, exit_game)
-    settings_menu = Settings_menu(theme, Settings, start_game, show_main_menu)
-    game_screen = game_Screen(screen)
+    settings_menu = Settings_menu(theme, settings, start_game, show_main_menu)
+    game_screen = game_Screen(screen, settings)
 
     shot_list = []
     ship_list = []
@@ -69,11 +71,13 @@ def main():
                 main_menu.handle_events(events)
                 main_menu.draw(screen)
             elif current_screen == "settings_menu":
+                # print(settings_menu.read_ship_placement_mode())
                 settings_menu.handle_events(events)
                 settings_menu.draw(screen)
             elif current_screen == "game":
+                # print(settings_menu.read_ship_placement_mode())
                 game_screen.handle_events(events)
-                game_screen.draw(shot_list, ship_list)
+                game_screen.draw(font)
 
             pygame.display.flip()
     finally:

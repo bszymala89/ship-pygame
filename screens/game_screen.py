@@ -14,6 +14,9 @@ class game_Screen:
         self.settings = settings
 
         self.stage = GameStage.PLANNING
+
+        self.start_button = None
+        self.main_menu_button = None
         
         self.start()
 
@@ -26,8 +29,17 @@ class game_Screen:
             self.stage = GameStage.PLAYING
 
     def auto_planning(self):
-        for i in range(SHIP_NUMBER):
-            self.ship_cells.add((random.randint(0, GRID_SIZE), random.randint(0, GRID_SIZE)))
+        while True:
+            if len(self.ship_cells) == SHIP_NUMBER:
+                break
+
+            rand1 = random.randint(0, GRID_SIZE - 1)
+            rand2 = random.randint(0, GRID_SIZE - 1)
+
+            if (rand1, rand2) in self.ship_cells:
+                continue
+
+            self.ship_cells.add((rand1, rand2))
 
     def manual_planning(self, horizontal_offset, horizontal_cell, vertical_offset, vertical_cell, step):
         if (
@@ -63,8 +75,13 @@ class game_Screen:
                     
 
             if len(self.ship_cells) != SHIP_NUMBER:
-                self.manual_planning(horizontal_offset, horizontal_cell, vertical_offset, vertical_cell, step)
-                return
+                if self.settings.ship_placement_mode == ShipPlacementMode.AUTO:
+                    self.auto_planning()
+                    self.stage = GameStage.PLAYING
+                    
+                elif self.settings.ship_placement_mode == ShipPlacementMode.MANUAL:
+                    self.manual_planning(horizontal_offset, horizontal_cell, vertical_offset, vertical_cell, step)
+                    return
 
             if self.stage == GameStage.PLAYING:
                 if (
@@ -79,6 +96,9 @@ class game_Screen:
     def draw(self, font):
         text = font.render(f"current stage {self.stage}", False, (0,0,0))
         self.screen.blit(text, (0,0))
+
+        placement_text = font.render(f"current placement mode {self.settings.ship_placement_mode}", False, (0,0,0))
+        self.screen.blit(placement_text, (0, 50))
 
         main_menu_text = font.render("Main Menu", False, (0,0,0))
 

@@ -66,8 +66,7 @@ class Settings_menu:
         return 0
     
     def change_ship_placement_mode(self, value, index):
-        self.settings.ship_placement_mode = value
-
+        self.settings.ship_placement_mode = value[0][1]
 
     def handle_events(self, events):
         self.menu.update(events)
